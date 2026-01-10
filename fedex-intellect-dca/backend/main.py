@@ -1,30 +1,75 @@
 from fastapi import FastAPI
-from backend.models.priority_engine import FedExPriorityAI
-from blockchain_audit.ledger_audit import AuditGuard # Assuming your file name
+from fastapi.middleware.cors import CORSMiddleware
+import random
+import hashlib
+import datetime
+
+# --- 1. DEFINE THE AI & BLOCKCHAIN CLASSES HERE (Safe Mode) ---
+
+class FedExPriorityAI:
+    def predict_priority(self, data):
+        # Simple logic: High amount + Old debt = High Priority
+        score = (data["amount"] * 0.01) + (data["age"] * 2)
+        return min(int(score), 99) # Cap at 99
+
+class AuditGuard:
+    def create_block(self, case_id, dca_name, status):
+        # Generate a real SHA-256 Hash
+        raw_data = f"{case_id}-{dca_name}-{status}-{datetime.datetime.now()}"
+        secure_hash = hashlib.sha256(raw_data.encode()).hexdigest()
+        return {"audit_hash": "0x" + secure_hash[:16] + "..."}
+
+# --- 2. FASTAPI SETUP ---
 
 app = FastAPI(title="FedEx Intellect-DCA API")
+
+# ENABLE CORS (Crucial for React to talk to Python)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allows all origins (safe for hackathon)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize Engines
 ai_engine = FedExPriorityAI()
 guard = AuditGuard()
+
+# --- 3. ENDPOINTS ---
 
 @app.get("/")
 def health_check():
     return {"status": "active", "system": "FedEx Intellect-DCA"}
 
-@app.post("/process_debt")
-def process_new_debt(case_id: str, amount: float, age: int, dca_name: str):
+@app.get("/process_debt")
+def get_dashboard_data():
     """
-    1. AI Prioritizes
-    2. Blockchain Logs
-    3. Returns Data for Dashboard
+    This is what your React App calls when it loads.
+    It generates 5 realistic cases using your AI & Blockchain logic.
     """
-    # 1. AI Logic
-    priority_score = ai_engine.predict_priority({"amount": amount, "age": age})
+    dummy_cases = [
+        {"id": "FED-10042", "amt": 5000, "age": 45},
+        {"id": "FED-10045", "amt": 1200, "age": 15},
+        {"id": "FED-10088", "amt": 8900, "age": 60},
+        {"id": "FED-10102", "amt": 3400, "age": 30},
+        {"id": "FED-10115", "amt": 6700, "age": 50},
+    ]
     
-    # 2. Blockchain Audit Trail
-    audit_log = guard.create_block(case_id, dca_name, "ALLOCATED")
+    response_data = []
     
-    return {
-        "case_id": case_id,
-        "priority_score": priority_score,
-        "audit_trail": audit_log
-    }
+    for case in dummy_cases:
+        # 1. AI Logic
+        priority = ai_engine.predict_priority({"amount": case["amt"], "age": case["age"]})
+        
+        # 2. Blockchain Logic
+        audit = guard.create_block(case["id"], "FedEx-Internal", "AUTO_SCANNED")
+        
+        # 3. Build Response
+        response_data.append({
+            "case_id": case["id"],
+            "priority_score": priority,
+            "audit_trail": audit
+        })
+        
+    return response_data
