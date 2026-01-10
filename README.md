@@ -46,11 +46,13 @@ By integrating **AI-driven prioritization** with **Immutable Blockchain Audit Tr
 ---
 
 ## 🛠️ Tech Stack
-* **Frontend:** React.js, Tailwind CSS, Recharts (Data Viz), Lucide React (Icons).
-* **Backend:** Python FastAPI (Simulated for Demo).
-* **Security:** SHA-256 Cryptographic Hashing.
-* **Deployment:** Cloud-Ready Architecture.
 
+* **Frontend:** React.js, Tailwind CSS (+ Glassmorphism & Animations), Recharts, Lucide React.
+* **Backend:** Python FastAPI (+ Mock Data Fail-Safe for stability).
+* **AI Engine:** GenAI Sentinel (+ Simulated Voice Sentiment Analysis).
+* **Security: **SHA-256 Hashing (+ GDPR Privacy Shield/PII Masking).
+* **UI/UX:** Dual-Theme Engine (Enterprise Dark Mode & Light Mode).
+* **Deployment:** Cloud-Ready Architecture.
 ---
 
 ## ⚡ DEPLOYMENT 
@@ -67,12 +69,12 @@ Use this if you are presenting directly from the Codespace browser.
 
 * BACKEND :
 
-Install Python Libraries:
+1.Install Python Libraries:
 
 ```Bash
 pip install fastapi uvicorn
 ```
-Start the Server:
+2.Start the Server:
 
 ```Bash
 uvicorn main:app --reload
@@ -80,17 +82,17 @@ uvicorn main:app --reload
 
 * FRONTEND
 
-* Navigate to the Frontend Folder:
+1.Navigate to the Frontend Folder:
 
 ```Bash
 cd fedex-intellect-dca/frontend
 ```
-* Install Dependencies (Only needed the first time):
+2.Install Dependencies (Only needed the first time):
 
 ```Bash
 npm install
 ```
-* Start the Server:
+3.Start the Server:
 
 ```Bash
 npm start
@@ -119,37 +121,37 @@ git clone https://github.com/gunanithi-coder/FEDEX-HACKTHON.git
  Open a NEW Command Prompt/Terminal (Do not close the React one).
  
 * BACKEND
-* 
-* Navigate to the Backend:
+  
+1.Navigate to the Backend:
 
 ```Bash
 cd FEDEX-HACKTHON/fedex-intellect-dca/backend
 ```
-Install Libraries:
+2.Install Libraries:
 
 ```Bash
 pip install fastapi uvicorn
 ```
-Start the Server:
+3.Start the Server:
 
 ```Bash
 uvicorn main:app --reload
 ```
 * FRONTEND
   
-* Navigate to the Frontend:
+1.Navigate to the Frontend:
   
 ```Bash
 cd FEDEX-HACKTHON/fedex-intellect-dca/frontend
 ```
-* Install the Libraries:
+2.Install the Libraries:
 
 ```Bash
 npm install
 ```
 (Note: This might take 1-2 minutes depending on your internet speed)
 
-* Run the App:
+3.Run the App:
 
 ```Bash
 npm start
