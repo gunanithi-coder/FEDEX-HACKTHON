@@ -1,4 +1,4 @@
-# 🛡️ FedEx Intellect-DCA: AI & Blockchain Governance Platform
+<img width="1523" height="92" alt="image" src="https://github.com/user-attachments/assets/c86a0b5c-a7e3-4886-917e-a0cefaf45755" /># 🛡️ FedEx Intellect-DCA: AI & Blockchain Governance Platform
 
 ![Status](https://img.shields.io/badge/Status-Live_Prototype-success) ![Tech](https://img.shields.io/badge/Stack-React_|_FastAPI_|_Blockchain-blue) ![FedEx](https://img.shields.io/badge/Focus-Smart_Debt_Recovery-purple)
 
@@ -47,10 +47,10 @@ By integrating **AI-driven prioritization** with **Immutable Blockchain Audit Tr
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** React.js, Tailwind CSS (+ Glassmorphism & Animations), Recharts, Lucide React.
-* **Backend:** Python FastAPI (+ Mock Data Fail-Safe for stability).
-* **AI Engine:** GenAI Sentinel (+ Simulated Voice Sentiment Analysis).
-* **Security: **SHA-256 Hashing (+ GDPR Privacy Shield/PII Masking).
+* **Frontend:** React.js, Tailwind CSS,Glassmorphism & Animations), Recharts, Lucide React.
+* **Backend:** Python FastAPI & Mock Data Fail-Safe for stability).
+* **AI Engine:** GenAI Sentinel & Simulated Voice Sentiment Analysis).
+* **Security:** SHA-256 Hashing & GDPR Privacy Shield/PII Masking).
 * **UI/UX:** Dual-Theme Engine (Enterprise Dark Mode & Light Mode).
 * **Deployment:** Cloud-Ready Architecture.
 ---
