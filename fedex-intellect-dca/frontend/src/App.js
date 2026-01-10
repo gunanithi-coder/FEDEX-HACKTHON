@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Shield, BarChart3, Users, Clock, TrendingUp, Lock, ArrowRight, LayoutDashboard } from 'lucide-react';
+import { Shield, BarChart3, Users, Clock, TrendingUp, Lock, ArrowRight, LayoutDashboard, AlertTriangle, CheckCircle, BellRing, FileText } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // --- MOCK DATA ---
@@ -57,6 +57,14 @@ const LoginPage = ({ onLogin }) => {
   );
 };
 
+// --- HELPER: FORMAT SECONDS ---
+const formatTime = (seconds) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+};
+
 // --- MAIN APP COMPONENT ---
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -65,6 +73,29 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAllocating, setIsAllocating] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null); 
+  
+  // --- SLA TIMER STATE ---
+  const [timeLeft, setTimeLeft] = useState({
+    case1: 2532, // 42 mins
+    case2: 11700, // 3h 15m
+    case3: 79845  // 22h
+  });
+
+  // --- BUTTON STATES ---
+  const [escalated, setEscalated] = useState(false);
+  const [notified, setNotified] = useState(false);
+
+  // --- TIMER LOGIC ---
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => ({
+        case1: prev.case1 > 0 ? prev.case1 - 1 : 0,
+        case2: prev.case2 > 0 ? prev.case2 - 1 : 0,
+        case3: prev.case3 > 0 ? prev.case3 - 1 : 0,
+      }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleAllocateBatch = () => {
     setIsAllocating(true);
@@ -73,6 +104,38 @@ function App() {
       alert("✅ AI Batch Allocation Complete: 3 New Critical Cases Added");
       setIsAllocating(false);
     }, 1500);
+  };
+
+  const handleEscalate = () => {
+    setEscalated(true);
+    alert("⚖️ LEGAL ESCALATION TRIGGERED\n\nCase FED-9901 has been digitally signed and transferred to the Legal Recovery Team.");
+  };
+
+  const handleNotify = () => {
+    setNotified(true);
+    alert("📧 AGENCY NOTIFIED\n\nAutomated warning email sent to 'Northwind Collections' regarding imminent SLA breach.");
+  };
+
+  // --- NEW: DOWNLOAD CSV REPORT ---
+  const handleDownloadReport = () => {
+    const headers = ["Case ID", "Time Remaining", "Status", "Action Taken"];
+    const rows = [
+      ["FED-9901", formatTime(timeLeft.case1), "CRITICAL", escalated ? "ESCALATED TO LEGAL" : "Pending"],
+      ["FED-9945", formatTime(timeLeft.case2), "AT RISK", notified ? "DCA NOTIFIED" : "Pending"],
+      ["FED-8821", formatTime(timeLeft.case3), "SAFE", "Monitoring"]
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n" 
+      + rows.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `FEDEX_SLA_REPORT_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
@@ -93,12 +156,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex font-sans animate-fade-in">
-      {/* Sidebar - FIXED WIDTH and VISIBLE TEXT */}
+      {/* Sidebar */}
       <div className="w-64 bg-fedexPurple text-white p-6 flex flex-col justify-between shadow-2xl flex-shrink-0">
         <div>
           <h1 className="text-xl font-bold mb-10 flex items-center gap-2">
             <Shield size={24} className="text-fedexOrange" />
-            FEDEX INTELLECT
+            FedEx Intellect
           </h1>
           <div className="text-xs text-purple-200 uppercase font-bold tracking-wider mb-2">Module Active</div>
           <div className="bg-white/10 p-3 rounded-lg flex items-center gap-2">
@@ -106,12 +169,7 @@ function App() {
             <span className="text-sm font-medium">System Online</span>
           </div>
         </div>
-        
-        {/* FIXED SIGN OUT BUTTON */}
-        <button 
-            onClick={() => setIsLoggedIn(false)} 
-            className="flex items-center gap-3 text-white bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all w-full font-bold"
-        >
+        <button onClick={() => setIsLoggedIn(false)} className="flex items-center gap-3 text-white bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all w-full font-bold">
             <Lock size={18} /> Sign Out
         </button>
       </div>
@@ -120,10 +178,9 @@ function App() {
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800">GOVERNANCE  COMMAND CENTER</h2>
+            <h2 className="text-3xl font-bold text-gray-800">GOVERNANCE COMMAND CENTER</h2>
             <p className="text-gray-500">Real-time AI Prioritization & Audit Logs</p>
           </div>
-          
           <button 
             onClick={handleAllocateBatch}
             disabled={isAllocating}
@@ -137,39 +194,18 @@ function App() {
 
         {/* --- TABS --- */}
         <div className="flex gap-6 mb-8 border-b border-gray-200 pb-1">
-          <button 
-            onClick={() => setActiveTab('dashboard')}
-            className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${
-              activeTab === 'dashboard' 
-                ? 'text-fedexPurple border-b-4 border-fedexPurple' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
+          <button onClick={() => setActiveTab('dashboard')} className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${activeTab === 'dashboard' ? 'text-fedexPurple border-b-4 border-fedexPurple' : 'text-gray-400 hover:text-gray-600'}`}>
             <LayoutDashboard size={20} /> Dashboard
           </button>
-          <button 
-            onClick={() => setActiveTab('allocations')}
-            className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${
-              activeTab === 'allocations' 
-                ? 'text-fedexPurple border-b-4 border-fedexPurple' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
+          <button onClick={() => setActiveTab('allocations')} className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${activeTab === 'allocations' ? 'text-fedexPurple border-b-4 border-fedexPurple' : 'text-gray-400 hover:text-gray-600'}`}>
             <Users size={20} /> Smart Allocations
           </button>
-          <button 
-            onClick={() => setActiveTab('sla')}
-            className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${
-              activeTab === 'sla' 
-                ? 'text-fedexPurple border-b-4 border-fedexPurple' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
+          <button onClick={() => setActiveTab('sla')} className={`pb-3 px-2 font-bold flex items-center gap-2 transition-all text-lg ${activeTab === 'sla' ? 'text-fedexPurple border-b-4 border-fedexPurple' : 'text-gray-400 hover:text-gray-600'}`}>
             <Clock size={20} /> SLA Monitor
           </button>
         </div>
 
-        {/* --- DASHBOARD CONTENT --- */}
+        {/* --- DASHBOARD TAB --- */}
         {activeTab === 'dashboard' && (
           <div className="animate-fade-in">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -203,7 +239,7 @@ function App() {
           </div>
         )}
 
-        {/* --- TABLE CONTENT --- */}
+        {/* --- ALLOCATIONS TAB --- */}
         {activeTab === 'allocations' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -243,12 +279,90 @@ function App() {
           </div>
         )}
 
-        {/* --- SLA CONTENT --- */}
+        {/* --- SLA MONITOR TAB --- */}
         {activeTab === 'sla' && (
-          <div className="bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center animate-fade-in">
-             <Clock size={48} className="mx-auto text-fedexPurple mb-4" />
-             <h3 className="text-xl font-bold text-gray-800">SLA Compliance Module</h3>
-             <p className="text-gray-500 mt-2">All systems running within 48-hour threshold.</p>
+          <div className="animate-fade-in space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-center justify-between">
+                  <div>
+                    <p className="text-red-600 text-xs font-bold uppercase tracking-wider">Critical Breaches</p>
+                    <h3 className="text-2xl font-bold text-gray-800">3 Cases</h3>
+                  </div>
+                  <div className="bg-white p-2 rounded-full shadow-sm text-red-500"><Clock size={20} /></div>
+               </div>
+               <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-100 flex items-center justify-between">
+                  <div>
+                    <p className="text-yellow-700 text-xs font-bold uppercase tracking-wider">At Risk ({'<'} 4h)</p>
+                    <h3 className="text-2xl font-bold text-gray-800">8 Cases</h3>
+                  </div>
+                  <div className="bg-white p-2 rounded-full shadow-sm text-yellow-600"><Clock size={20} /></div>
+               </div>
+               <div className="bg-green-50 p-4 rounded-xl border border-green-100 flex items-center justify-between">
+                  <div>
+                    <p className="text-green-700 text-xs font-bold uppercase tracking-wider">Avg Resolution</p>
+                    <h3 className="text-2xl font-bold text-gray-800">14h 30m</h3>
+                  </div>
+                  <div className="bg-white p-2 rounded-full shadow-sm text-green-600"><Shield size={20} /></div>
+               </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+               <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                  <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    Live SLA Countdown
+                  </h3>
+                  <button onClick={handleDownloadReport} className="text-xs font-bold text-fedexPurple hover:underline flex items-center gap-1">
+                      <FileText size={14} /> Download Report
+                  </button>
+               </div>
+               <table className="w-full text-left">
+                  <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <tr>
+                      <th className="p-4">Case ID</th>
+                      <th className="p-4">Time Remaining</th>
+                      <th className="p-4">Status</th>
+                      <th className="p-4">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                     <tr className="hover:bg-red-50 transition-colors">
+                        <td className="p-4 font-bold text-gray-800">FED-9901</td>
+                        <td className="p-4 font-mono text-red-600 font-bold">{formatTime(timeLeft.case1)}</td>
+                        <td className="p-4"><span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">CRITICAL</span></td>
+                        <td className="p-4">
+                            {escalated ? (
+                                <span className="flex items-center gap-1 text-green-600 font-bold text-xs"><CheckCircle size={14}/> ESCALATED</span>
+                            ) : (
+                                <button onClick={handleEscalate} className="text-xs bg-gray-900 text-white px-3 py-1 rounded hover:bg-black flex items-center gap-1">
+                                    <AlertTriangle size={12}/> Auto-Escalate
+                                </button>
+                            )}
+                        </td>
+                     </tr>
+                     <tr className="hover:bg-yellow-50 transition-colors">
+                        <td className="p-4 font-bold text-gray-800">FED-9945</td>
+                        <td className="p-4 font-mono text-yellow-700 font-bold">{formatTime(timeLeft.case2)}</td>
+                        <td className="p-4"><span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">AT RISK</span></td>
+                        <td className="p-4">
+                            {notified ? (
+                                <span className="flex items-center gap-1 text-blue-600 font-bold text-xs"><CheckCircle size={14}/> NOTIFIED</span>
+                            ) : (
+                                <button onClick={handleNotify} className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50 flex items-center gap-1">
+                                    <BellRing size={12}/> Notify DCA
+                                </button>
+                            )}
+                        </td>
+                     </tr>
+                     <tr>
+                        <td className="p-4 font-bold text-gray-800">FED-8821</td>
+                        <td className="p-4 font-mono text-gray-500">{formatTime(timeLeft.case3)}</td>
+                        <td className="p-4"><span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">SAFE</span></td>
+                        <td className="p-4"><button className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">View Details</button></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
           </div>
         )}
 
