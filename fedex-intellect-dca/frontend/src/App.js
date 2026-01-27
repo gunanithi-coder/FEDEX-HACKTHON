@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Shield, BarChart3, Users, Clock, TrendingUp, Lock, ArrowRight, AlertTriangle, CheckCircle, BellRing, FileText, MessageSquare, Send, X, Bot, Mic, PhoneOff, Activity, AlertOctagon, Eye, EyeOff, Zap, PlayCircle, PauseCircle, Plus, Terminal, Layout, Moon, Sun } from 'lucide-react';
+// CLEANED: Removed TrendingUp, Zap, and Layout to fix Vercel build errors
+import { Shield, BarChart3, Users, Clock, Lock, ArrowRight, AlertTriangle, CheckCircle, BellRing, FileText, MessageSquare, Send, X, Bot, Mic, PhoneOff, Activity, AlertOctagon, Eye, EyeOff, PlayCircle, PauseCircle, Plus, Terminal, Moon, Sun } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // --- MOCK DATA ---
@@ -196,7 +197,7 @@ function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   
   // --- STATES ---
-  const [darkMode, setDarkMode] = useState(false); // DARK MODE TOGGLE
+  const [darkMode, setDarkMode] = useState(false); 
   const [privacyMode, setPrivacyMode] = useState(false);
   const [autoPilot, setAutoPilot] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ case1: 2532, case2: 11700, case3: 79845 });
@@ -296,16 +297,13 @@ function App() {
                     </div>
                 </div>
                 
-                {/* SETTINGS GROUP */}
                 <div className="space-y-3">
                     <p className="text-[10px] uppercase text-gray-500 font-bold mb-1">Controls</p>
                     
-                    {/* PRIVACY TOGGLE */}
                     <button onClick={() => setPrivacyMode(!privacyMode)} className={`w-full flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all border ${privacyMode ? 'bg-orange-500/20 border-orange-500/50 text-orange-200' : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10'}`}>
                         {privacyMode ? <EyeOff size={16} /> : <Eye size={16} />} {privacyMode ? "Privacy ON" : "Privacy OFF"}
                     </button>
 
-                    {/* DARK MODE TOGGLE */}
                     <button onClick={() => setDarkMode(!darkMode)} className={`w-full flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all border ${darkMode ? 'bg-purple-500/20 border-purple-500/50 text-purple-200' : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10'}`}>
                         {darkMode ? <Sun size={16} /> : <Moon size={16} />} {darkMode ? "Light Mode" : "Dark Mode"}
                     </button>
@@ -335,7 +333,6 @@ function App() {
                 </div>
                 </header>
 
-                {/* --- TABS --- */}
                 <div className={`flex gap-8 mb-8 border-b pb-1 ${darkMode ? 'border-gray-800' : 'border-gray-200/60'}`}>
                     {['dashboard', 'allocations', 'sla'].map(tab => (
                         <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-3 px-1 font-bold flex items-center gap-2 transition-all text-sm uppercase tracking-wide ${activeTab === tab ? 'text-[#a855f7] border-b-2 border-[#a855f7]' : (darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`}>
@@ -344,7 +341,6 @@ function App() {
                     ))}
                 </div>
 
-                {/* --- TAB: DASHBOARD --- */}
                 {activeTab === 'dashboard' && (
                 <div className="animate-fade-in space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -379,7 +375,6 @@ function App() {
                 </div>
                 )}
 
-                {/* --- TAB: ALLOCATIONS --- */}
                 {activeTab === 'allocations' && (
                 <div className={`${cardClass} rounded-2xl overflow-hidden animate-fade-in`}>
                     <div className={`p-4 border-b flex justify-between items-center ${darkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-100 bg-slate-50/50'}`}>
@@ -421,7 +416,6 @@ function App() {
                 </div>
                 )}
 
-                {/* --- TAB: SLA MONITOR --- */}
                 {activeTab === 'sla' && (
                 <div className="animate-fade-in space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -464,7 +458,6 @@ function App() {
                 </div>
                 )}
 
-                {/* --- AUDIT MODAL --- */}
                 {selectedCase && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedCase(null)}>
                     <div className={`rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in ${darkMode ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
@@ -483,7 +476,6 @@ function App() {
                 </div>
                 )}
 
-                {/* --- MANUAL ENTRY MODAL --- */}
                 {isManualModalOpen && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className={`rounded-2xl shadow-2xl max-w-md w-full animate-fade-in overflow-hidden border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-white/20'}`}>
